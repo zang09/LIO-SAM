@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="project" default="lio_sam"/>
+
+    <!--- Image transparent -->
+    <node pkg="image_transport" type="republish" name="republish" args="compressed in:=/usb_cam/image_raw raw out:=/usb_cam/image_raw_down" output="screen"/>
+
+    <!--- Sim Time -->
+    <param name="use_sim_time" value="false" />
+
+    <!-- Parameters -->
+    <rosparam file="$(find lio_sam)/config/mti_params.yaml" command="load" />
+
+    <!--- LOAM -->
+    <include file="$(find lio_sam)/launch/include/module_loam.launch" />
+
+    <!--- Robot State TF -->
+    <include file="$(find lio_sam)/launch/include/module_robot_state_publisher.launch" />
+
+    <!--- Run Navsat -->
+    <include file="$(find lio_sam)/launch/include/module_navsat.launch" />
+
+    <!--- Run Rviz-->
+    <include file="$(find lio_sam)/launch/include/module_rviz.launch" />
+
+    <!--- Publish fake gps Coordinate -->
+    <!--node pkg="rostopic" type="rostopic" name="fake_gps_map" args="pub /gps/map sensor_msgs/NavSatFix
+    '{header: {frame_id: map}, latitude: 37.56210553501652, longitude: 126.93447659683994, altitude: 36.149484319612384}'" /-->
+
+</launch>
