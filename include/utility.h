@@ -6,15 +6,18 @@
 
 #include <std_msgs/Header.h>
 #include <std_msgs/Float64MultiArray.h>
+#include <std_msgs/Bool.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
+#include <geographic_msgs/GeoPointStamped.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
 #include <opencv/cv.h>
+#include <yaml-cpp/yaml.h>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -70,8 +73,9 @@ public:
     //Topics
     string pointCloudTopic;
     string imuTopic;
-    string odomTopic;
     string gpsTopic;
+    string odomTopic;
+    string gpsOdomTopic;
 
     //Frames
     string lidarFrame;
@@ -87,12 +91,14 @@ public:
 
     // Save pcd
     bool savePCD;
+    bool saveUTMcoord;
     string savePCDDirectory;
 
     // Lidar Sensor Configuration
     SensorType sensor;
     int N_SCAN;
     int Horizon_SCAN;
+    string timeField;
     int downsampleRate;
     float lidarMinRange;
     float lidarMaxRange;
@@ -156,8 +162,9 @@ public:
 
         nh.param<std::string>("lio_sam/pointCloudTopic", pointCloudTopic, "points_raw");
         nh.param<std::string>("lio_sam/imuTopic", imuTopic, "imu_correct");
+        nh.param<std::string>("lio_sam/gpsTopic", gpsTopic, "gps/fix");
         nh.param<std::string>("lio_sam/odomTopic", odomTopic, "odometry/imu");
-        nh.param<std::string>("lio_sam/gpsTopic", gpsTopic, "odometry/gps");
+        nh.param<std::string>("lio_sam/gpsOdomTopic", gpsOdomTopic, "odometry/gps");
 
         nh.param<std::string>("lio_sam/lidarFrame", lidarFrame, "base_link");
         nh.param<std::string>("lio_sam/baselinkFrame", baselinkFrame, "base_link");
@@ -170,6 +177,7 @@ public:
         nh.param<float>("lio_sam/poseCovThreshold", poseCovThreshold, 25.0);
 
         nh.param<bool>("lio_sam/savePCD", savePCD, false);
+        nh.param<bool>("lio_sam/saveUTMcoord", saveUTMcoord, false);
         nh.param<std::string>("lio_sam/savePCDDirectory", savePCDDirectory, "/Downloads/LOAM/");
 
         std::string sensorStr;
@@ -259,7 +267,20 @@ public:
         imu_out.angular_velocity.x = gyr.x();
         imu_out.angular_velocity.y = gyr.y();
         imu_out.angular_velocity.z = gyr.z();
+
         // rotate roll pitch yaw
+//        double imuRoll, imuPitch, imuYaw;
+//        tf::Quaternion orientation;
+//        tf::quaternionMsgToTF(imu_in.orientation, orientation);
+//        tf::Matrix3x3(orientation).getRPY(imuRoll, imuPitch, imuYaw);
+
+//        Eigen::Vector3d RPY = {imuRoll, imuPitch, imuYaw};
+//        Eigen::Vector3d rotate_RPY = extRPY * RPY;
+
+//        tf::Quaternion q_final;
+//        q_final.setRPY(rotate_RPY[0], rotate_RPY[1], rotate_RPY[2]);
+//        tf::quaternionTFToMsg(q_final, imu_out.orientation);
+
         Eigen::Quaterniond q_from(imu_in.orientation.w, imu_in.orientation.x, imu_in.orientation.y, imu_in.orientation.z);
         Eigen::Quaterniond q_final = q_from * extQRPY;
         imu_out.orientation.x = q_final.x();
