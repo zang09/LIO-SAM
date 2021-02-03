@@ -245,7 +245,7 @@ public:
 
     matP = cv::Mat(6, 6, CV_32F, cv::Scalar::all(0));
 
-    gpsAccuracyFlag.data = false;
+    gpsAccuracyFlag.data = true;
     gpsOriginPoint.latitude = 0;
     gpsOriginPoint.longitude = 0;
     gpsOriginPoint.altitude = 0;
@@ -292,67 +292,73 @@ public:
     double accuracy = sqrt(pow(utmMsg->easting_sigma,2)+pow(utmMsg->northing_sigma,2));
     //std::cout << "accuracy: " << accuracy << std::endl;
 
+    float tempCornerLeafSize, tempSurfLeafSize;
+
     if(accuracy > 1.0 && gpsAccuracyFlag.data)
     {
-      mappingCornerLeafSize = 0.1;
-      mappingSurfLeafSize = 0.2;
-      std::cout << "mappingSurfLeafSize: " << mappingSurfLeafSize << std::endl;
-      std::cout << "mappingCornerLeafSize: " << mappingCornerLeafSize << std::endl;
+      tempCornerLeafSize = mappingCornerLeafSize/2.f;
+      tempSurfLeafSize = mappingSurfLeafSize/2.f;
 
-      downSizeFilterCorner.setLeafSize(mappingCornerLeafSize, mappingCornerLeafSize, mappingCornerLeafSize);
-      downSizeFilterSurf.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
-      downSizeFilterICP.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
+      std::cout << "mappingCornerLeafSize: " << tempCornerLeafSize << std::endl;
+      std::cout << "mappingSurfLeafSize: " << tempSurfLeafSize << std::endl;
+
+      downSizeFilterCorner.setLeafSize(tempCornerLeafSize, tempCornerLeafSize, tempCornerLeafSize);
+      downSizeFilterSurf.setLeafSize(tempSurfLeafSize, tempSurfLeafSize, tempSurfLeafSize);
+      downSizeFilterICP.setLeafSize(tempSurfLeafSize, tempSurfLeafSize, tempSurfLeafSize);
 
       gpsAccuracyFlag.data = false;
       pubGPSAccuracyInfo.publish(gpsAccuracyFlag);
     }
     else if(accuracy > 0 && accuracy <= 1.0 && !gpsAccuracyFlag.data)
     {
-      mappingCornerLeafSize = 0.2;
-      mappingSurfLeafSize = 0.4;
-      std::cout << "mappingSurfLeafSize: " << mappingSurfLeafSize << std::endl;
-      std::cout << "mappingCornerLeafSize: " << mappingCornerLeafSize << std::endl;
+      tempCornerLeafSize = mappingCornerLeafSize;
+      tempSurfLeafSize = mappingSurfLeafSize;
 
-      downSizeFilterCorner.setLeafSize(mappingCornerLeafSize, mappingCornerLeafSize, mappingCornerLeafSize);
-      downSizeFilterSurf.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
-      downSizeFilterICP.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
+      std::cout << "mappingCornerLeafSize: " << tempCornerLeafSize << std::endl;
+      std::cout << "mappingSurfLeafSize: " << tempSurfLeafSize << std::endl;
+
+      downSizeFilterCorner.setLeafSize(tempCornerLeafSize, tempCornerLeafSize, tempCornerLeafSize);
+      downSizeFilterSurf.setLeafSize(tempSurfLeafSize, tempSurfLeafSize, tempSurfLeafSize);
+      downSizeFilterICP.setLeafSize(tempSurfLeafSize, tempSurfLeafSize, tempSurfLeafSize);
 
       gpsAccuracyFlag.data = true;
       pubGPSAccuracyInfo.publish(gpsAccuracyFlag);
     }
   }
 
-  //  void gpsHandler(const sensor_msgs::NavSatFix::ConstPtr& gpsMsg)
-  //  {
-  //    if(gpsMsg->status.status == -1)
-  //    {
-  //        mappingCornerLeafSize = 0.1;
-  //        mappingSurfLeafSize = 0.2;
-  //        std::cout << "mappingSurfLeafSize: " << mappingSurfLeafSize << std::endl;
-  //        std::cout << "mappingCornerLeafSize: " << mappingCornerLeafSize << std::endl;
+  /*
+  void gpsHandler(const sensor_msgs::NavSatFix::ConstPtr& gpsMsg)
+  {
+    if(gpsMsg->status.status == -1)
+    {
+        mappingCornerLeafSize = 0.1;
+        mappingSurfLeafSize = 0.2;
+        std::cout << "mappingSurfLeafSize: " << mappingSurfLeafSize << std::endl;
+        std::cout << "mappingCornerLeafSize: " << mappingCornerLeafSize << std::endl;
 
-  //        downSizeFilterCorner.setLeafSize(mappingCornerLeafSize, mappingCornerLeafSize, mappingCornerLeafSize);
-  //        downSizeFilterSurf.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
-  //        downSizeFilterICP.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
+        downSizeFilterCorner.setLeafSize(mappingCornerLeafSize, mappingCornerLeafSize, mappingCornerLeafSize);
+        downSizeFilterSurf.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
+        downSizeFilterICP.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
 
-  //        gpsAccuracyFlag.data = false;
-  //        pubGPSAccuracyInfo.publish(gpsAccuracyFlag);
-  //    }
-  //    else
-  //    {
-  //        mappingCornerLeafSize = 0.2;
-  //        mappingSurfLeafSize = 0.4;
-  //        std::cout << "mappingSurfLeafSize: " << mappingSurfLeafSize << std::endl;
-  //        std::cout << "mappingCornerLeafSize: " << mappingCornerLeafSize << std::endl;
+        gpsAccuracyFlag.data = false;
+        pubGPSAccuracyInfo.publish(gpsAccuracyFlag);
+    }
+    else
+    {
+        mappingCornerLeafSize = 0.2;
+        mappingSurfLeafSize = 0.4;
+        std::cout << "mappingSurfLeafSize: " << mappingSurfLeafSize << std::endl;
+        std::cout << "mappingCornerLeafSize: " << mappingCornerLeafSize << std::endl;
 
-  //        downSizeFilterCorner.setLeafSize(mappingCornerLeafSize, mappingCornerLeafSize, mappingCornerLeafSize);
-  //        downSizeFilterSurf.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
-  //        downSizeFilterICP.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
+        downSizeFilterCorner.setLeafSize(mappingCornerLeafSize, mappingCornerLeafSize, mappingCornerLeafSize);
+        downSizeFilterSurf.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
+        downSizeFilterICP.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
 
-  //        gpsAccuracyFlag.data = true;
-  //        pubGPSAccuracyInfo.publish(gpsAccuracyFlag);
-  //    }
-  //  }
+        gpsAccuracyFlag.data = true;
+        pubGPSAccuracyInfo.publish(gpsAccuracyFlag);
+    }
+  }
+  */
 
   void gpsOdomHandler(const nav_msgs::Odometry::ConstPtr& gpsOdomMsg)
   {
@@ -534,7 +540,7 @@ public:
     }
 
     int ret = pcl::io::savePCDFileBinary(saveMapDirectory + "/GlobalMap.pcd", *globalMapCloud);
-    res.success = ret == 0;
+    res.success = (ret == 0);
 
     downSizeFilterCorner.setLeafSize(mappingCornerLeafSize, mappingCornerLeafSize, mappingCornerLeafSize);
     downSizeFilterSurf.setLeafSize(mappingSurfLeafSize, mappingSurfLeafSize, mappingSurfLeafSize);
@@ -568,7 +574,7 @@ public:
     cout << "****************************************************" << endl;
     cout << "Saving map to pcd files completed\n" << endl;
 
-    return true;
+    return res.success;
   }
 
   void visualizeGlobalMapThread()
