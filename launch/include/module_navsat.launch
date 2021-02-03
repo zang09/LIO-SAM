@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
 
     <arg name="project" default="lio_sam"/>
@@ -6,15 +7,13 @@
     
     <!-- EKF GPS-->
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_gps" respawn="true">
-        <remap from="odometry/filtered" to="odometry/navsat" />
     </node>
 
     <!-- Navsat -->
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat" respawn="true">
-        <!-- <rosparam param="datum">[42.35893211, -71.09345588, 0.0, world, base_link]</rosparam> -->
-        <remap from="imu/data" to="imu_correct" />
-        <remap from="gps/fix" to="gps/fix" />
-        <remap from="odometry/filtered" to="odometry/navsat" />
+        <!-- rosparam param="datum">[37.56210553147844, 126.9344762777947, 0.0, map, odom]</rosparam -->
+        <remap from="imu/data" to="mti30/imu/data" />
+        <remap from="gps/fix" to="pwk7/gps/fix" />
     </node>
 
 </launch>
