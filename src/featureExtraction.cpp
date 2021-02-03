@@ -18,6 +18,7 @@ class FeatureExtraction : public ParamServer
 public:
 
     ros::Subscriber subLaserCloudInfo;
+    ros::Subscriber subGPSAccuracyInfo;
 
     ros::Publisher pubLaserCloudInfo;
     ros::Publisher pubCornerPoints;
@@ -40,6 +41,7 @@ public:
     FeatureExtraction()
     {
         subLaserCloudInfo = nh.subscribe<lio_sam::cloud_info>("lio_sam/deskew/cloud_info", 1, &FeatureExtraction::laserCloudInfoHandler, this, ros::TransportHints().tcpNoDelay());
+        subGPSAccuracyInfo = nh.subscribe<std_msgs::Bool>("lio_sam/mapping/gps_accuracy_info", 1, &FeatureExtraction::gpsAccuracyInfoHandler, this, ros::TransportHints().tcpNoDelay());
 
         pubLaserCloudInfo = nh.advertise<lio_sam::cloud_info> ("lio_sam/feature/cloud_info", 1);
         pubCornerPoints = nh.advertise<sensor_msgs::PointCloud2>("lio_sam/feature/cloud_corner", 1);
@@ -63,6 +65,7 @@ public:
         cloudLabel = new int[N_SCAN*Horizon_SCAN];
     }
 
+    //lidar callback
     void laserCloudInfoHandler(const lio_sam::cloud_infoConstPtr& msgIn)
     {
         cloudInfo = *msgIn; // new cloud info
@@ -76,6 +79,17 @@ public:
         extractFeatures();
 
         publishFeatureCloud();
+    }
+
+    void gpsAccuracyInfoHandler(const std_msgs::Bool::ConstPtr& msgIn)
+    {
+        bool flag = msgIn->data;
+
+        if(flag) odometrySurfLeafSize = 0.4;
+        else odometrySurfLeafSize = 0.2;
+
+        std::cout << "odometrySurfLeafSize: " << odometrySurfLeafSize << std::endl;
+        downSizeFilter.setLeafSize(odometrySurfLeafSize, odometrySurfLeafSize, odometrySurfLeafSize);
     }
 
     void calculateSmoothness()
