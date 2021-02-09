@@ -1574,7 +1574,7 @@ public:
         if (abs(gps_x) < 1e-6 && abs(gps_y) < 1e-6)
           continue;
 
-        // Add GPS every a few meters
+        // Add GPS every a few(5) meters
         PointType curGPSPoint;
         curGPSPoint.x = gps_x;
         curGPSPoint.y = gps_y;

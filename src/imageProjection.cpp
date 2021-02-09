@@ -30,6 +30,19 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(OusterPointXYZIRT,
     (uint8_t, ring, ring) (uint16_t, noise, noise) (uint32_t, range, range)
 )
 
+struct HesaiPointXYZIRT {
+    PCL_ADD_POINT4D;
+    float intensity;
+    double timestamp;
+    uint16_t ring;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(HesaiPointXYZIRT,
+    (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)
+    (double, timestamp, timestamp)(uint16_t, ring, ring)
+)
+
 // Use the Velodyne point format as a common representation
 using PointXYZIRT = VelodynePointXYZIRT;
 
@@ -68,6 +81,7 @@ private:
 
     pcl::PointCloud<PointXYZIRT>::Ptr laserCloudIn;
     pcl::PointCloud<OusterPointXYZIRT>::Ptr tmpOusterCloudIn;
+    pcl::PointCloud<HesaiPointXYZIRT>::Ptr tmpHesaiCloudIn;
     pcl::PointCloud<PointType>::Ptr   fullCloud;
     pcl::PointCloud<PointType>::Ptr   extractedCloud;
 
@@ -106,6 +120,7 @@ public:
     {
         laserCloudIn.reset(new pcl::PointCloud<PointXYZIRT>());
         tmpOusterCloudIn.reset(new pcl::PointCloud<OusterPointXYZIRT>());
+        tmpHesaiCloudIn.reset(new pcl::PointCloud<HesaiPointXYZIRT>());
         fullCloud.reset(new pcl::PointCloud<PointType>());
         extractedCloud.reset(new pcl::PointCloud<PointType>());
 
@@ -222,6 +237,24 @@ public:
                 dst.time = src.t * 1e-9f;
             }
         }
+        else if (sensor == SensorType::HESAI)
+        {
+            pcl::moveFromROSMsg(currentCloudMsg, *tmpHesaiCloudIn);
+            laserCloudIn->points.resize(tmpHesaiCloudIn->size());
+            laserCloudIn->is_dense = tmpHesaiCloudIn->is_dense;
+
+            for (size_t i = 0; i < tmpHesaiCloudIn->size(); i++)
+            {
+                auto &src = tmpHesaiCloudIn->points[i];
+                auto &dst = laserCloudIn->points[i];
+                dst.x = src.x;
+                dst.y = src.y;
+                dst.z = src.z;
+                dst.intensity = src.intensity;
+                dst.ring = src.ring;
+                dst.time = src.timestamp-currentCloudMsg.header.stamp.toSec();
+            }
+        }
         else
         {
             ROS_ERROR_STREAM("Unknown sensor type: " << int(sensor));
@@ -232,6 +265,9 @@ public:
         cloudHeader = currentCloudMsg.header;
         timeScanCur = cloudHeader.stamp.toSec();
         timeScanEnd = timeScanCur + laserCloudIn->points.back().time;
+
+        //std::cout << std::setprecision(30) << "cur: " << laserCloudIn->points.front().time << std::endl;
+        //std::cout << std::setprecision(30) << "end: " << laserCloudIn->points.back().time << std::endl << std::endl;
 
         // check dense flag
         if (laserCloudIn->is_dense == false)
@@ -266,7 +302,7 @@ public:
             deskewFlag = -1;
             for (auto &field : currentCloudMsg.fields)
             {
-                if (field.name == "time" || field.name == "t")
+                if (field.name == "time" || field.name == "t" || field.name == "timestamp")
                 {
                     deskewFlag = 1;
                     break;
