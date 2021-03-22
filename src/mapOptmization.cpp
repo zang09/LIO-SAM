@@ -484,25 +484,26 @@ public:
 
     if(saveUTMcoord)
     {
-      if(gpsOriginPoint.latitude==0 && gpsOriginPoint.longitude==0)
+      if(gpsOriginPoint.latitude==0.0 && gpsOriginPoint.longitude==0.0)
       {
         ROS_WARN("No gps coordinate!");
         ROS_WARN("Save as local coordinate...");
       }
       else
       {
-        for(size_t i=0; i<globalCornerCloud->size(); i++)
+        //std::cout << std::setprecision(15) << "UTM lat: " << gpsUTMOriginPoint.latitude << std::endl;
+        //std::cout << std::setprecision(15) << "UTM lon: " << gpsUTMOriginPoint.longitude << std::endl;
+
+        for(int i=0; i<(int)globalCornerCloud->size(); i++)
         {
           globalCornerCloud->points[i].x += gpsUTMOriginPoint.latitude;
           globalCornerCloud->points[i].y += gpsUTMOriginPoint.longitude;
-          globalCornerCloud->points[i].z += gpsUTMOriginPoint.altitude;
         }
 
-        for(size_t i=0; i<globalSurfCloud->size(); i++)
+        for(int i=0; i<(int)globalSurfCloud->size(); i++)
         {
           globalSurfCloud->points[i].x += gpsUTMOriginPoint.latitude;
           globalSurfCloud->points[i].y += gpsUTMOriginPoint.longitude;
-          globalSurfCloud->points[i].z += gpsUTMOriginPoint.altitude;
         }
       }
     }

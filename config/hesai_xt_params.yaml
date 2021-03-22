@@ -1,7 +1,7 @@
 lio_sam:
 
   # Topics
-  pointCloudTopic: "hesai/pandar"          # Point cloud data
+  pointCloudTopic: "hesai/pandar"             # Point cloud data
   imuTopic: "mti30/imu/data"                  # IMU data
   gpsTopic: "pwk7/gps/fix"                    # GPS data
   odomTopic: "odometry/imu"                   # IMU pre-preintegration odometry
@@ -21,13 +21,13 @@ lio_sam:
   
   # Export settings
   savePCD: false                              # https://github.com/TixiaoShan/LIO-SAM/issues/3
-  saveUTMcoord: true
+  saveUTMcoord: false
   savePCDDirectory: "/Map/lio-sam"            # in your home folder, starts and ends with "/".
 
   # Sensor Settings
   sensor: hesai                               # lidar sensor type, either 'velodyne' or 'ouster' or 'hesai'
-  N_SCAN: 64                                  # number of lidar channel (i.e., 16, 32, 64, 128)
-  Horizon_SCAN: 600                           # lidar horizontal resolution (Velodyne:1800, Ouster:512,1024,2048)
+  N_SCAN: 32                                  # number of lidar channel (i.e., 16, 32, 64, 128)
+  Horizon_SCAN: 2000                          # lidar horizontal resolution (Velodyne:1800, Ouster:512,1024,2048)
   downsampleRate: 1                           # default 1.Downsample your data if too many points
   lidarMinRange: 1.0                          # default 1.0, minimum lidar range to be used
   lidarMaxRange: 1000.0                       # default 1000.0, maximum lidar range to be used
@@ -58,9 +58,9 @@ lio_sam:
   surfFeatureMinValidNum: 100
 
   # voxel filter paprams
-  odometrySurfLeafSize: 0.4                     # default: 0.4 - outdoor, 0.2 - indoor
-  mappingCornerLeafSize: 0.2                    # default: 0.2 - outdoor, 0.1 - indoor
-  mappingSurfLeafSize: 0.4                      # default: 0.4 - outdoor, 0.2 - indoor
+  odometrySurfLeafSize: 0.1                     # default: 0.4 - outdoor, 0.2 - indoor
+  mappingCornerLeafSize: 0.05                    # default: 0.2 - outdoor, 0.1 - indoor
+  mappingSurfLeafSize: 0.1                      # default: 0.4 - outdoor, 0.2 - indoor
 
   # robot motion constraint (in case you are using a 2D robot)
   z_tollerance: 1000                            # meters
