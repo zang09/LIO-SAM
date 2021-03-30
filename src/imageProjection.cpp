@@ -217,7 +217,7 @@ public:
         cloudQueue.pop_front();
         if (sensor == SensorType::VELODYNE)
         {
-            pcl::moveFromROSMsg(currentCloudMsg, *laserCloudIn);
+            pcl::moveFromROSMsg(currentCloudMsg, *laserCloudIn);            
         }
         else if (sensor == SensorType::OUSTER)
         {
@@ -260,6 +260,12 @@ public:
             ROS_ERROR_STREAM("Unknown sensor type: " << int(sensor));
             ros::shutdown();
         }
+
+        Eigen::Affine3f transform = Eigen::Affine3f::Identity();
+        transform.rotate (Eigen::AngleAxisf (-mountAngle, Eigen::Vector3f::UnitY()));
+
+        // Executing the transformation
+        pcl::transformPointCloud (*laserCloudIn, *laserCloudIn, transform);
 
         // get timestamp
         cloudHeader = currentCloudMsg.header;
