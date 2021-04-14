@@ -21,7 +21,7 @@ lio_sam:
   
   # Export settings
   savePCD: false                              # https://github.com/TixiaoShan/LIO-SAM/issues/3
-  saveUTMcoord: true
+  saveUTMcoord: false
   savePCDDirectory: "/Map/lio-sam"            # in your home folder, starts and ends with "/".
 
   # Sensor Settings
@@ -43,7 +43,7 @@ lio_sam:
   # Extrinsics (lidar -> IMU)
   extrinsicTrans: [0.0, 0.0, 0.0]
 
-  ## 180
+  ## 90
   extrinsicRot: [0, -1, 0,
                  1, 0, 0,
                  0, 0, 1]
