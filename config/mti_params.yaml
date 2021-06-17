@@ -14,9 +14,9 @@ lio_sam:
   mapFrame: "map"
 
   # GPS Settings
-  useImuHeadingInitialization: true           # if using GPS data, set to "true"
+  useImuHeadingInitialization: false          # if using GPS data, set to "true"
   useGpsElevation: true                       # if GPS elevation is bad, set to "false"
-  gpsCovThreshold: 3.0                        # m^2, threshold for using GPS data //2
+  gpsCovThreshold: 4.0                        # m^2, threshold for using GPS data //2
   poseCovThreshold: 1.0                       # m^2, threshold for using GPS data //25
   
   # Export settings
@@ -67,7 +67,7 @@ lio_sam:
   rotation_tollerance: 1000                     # radians
 
   # CPU Params
-  numberOfCores: 4                              # number of cores for mapping optimization
+  numberOfCores: 8                              # number of cores for mapping optimization
   mappingProcessInterval: 0.15                  # seconds, regulate mapping frequency
 
   # Surrounding map
@@ -86,7 +86,7 @@ lio_sam:
   historyKeyframeFitnessScore: 0.3              # icp threshold, the smaller the better alignment
 
   # Visualization
-  globalMapVisualizationSearchRadius: 1000.0    # meters, global map visualization radius
+  globalMapVisualizationSearchRadius: 10000.0    # meters, global map visualization radius
   globalMapVisualizationPoseDensity: 10.0       # meters, global map visualization keyframe density
   globalMapVisualizationLeafSize: 1.0           # meters, global map visualization cloud density
 
@@ -99,10 +99,10 @@ navsat:
   magnetic_declination_radians: 0
   yaw_offset: 0
   zero_altitude: false
-  use_odometry_yaw: true
+  use_odometry_yaw: false #important
   broadcast_cartesian_transform: true
   broadcast_cartesian_transform_as_parent_frame: false
-  publish_filtered_gps: false
+  publish_filtered_gps: true
   publish_origin_gps: true
 
 # EKF for Navsat
@@ -120,7 +120,7 @@ ekf_gps:
   # -------------------------------------
   # External IMU:
   # -------------------------------------
-  imu0: mti30/imu/data
+  imu0: mti30/imu/data #imu_link
   # make sure the input is aligned with ROS REP105. "imu_correct" is manually transformed by myself. EKF can also transform the data using tf between your imu and base_link
 
   imu0_config: [false, false, false,

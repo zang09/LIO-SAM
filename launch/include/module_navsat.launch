@@ -12,7 +12,7 @@
     <!-- Navsat -->
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat" respawn="true">
         <!-- rosparam param="datum">[37.56210553147844, 126.9344762777947, 0.0, map, odom]</rosparam -->
-        <remap from="imu/data" to="mti30/imu/data" />
+        <remap from="imu/data" to="imu_correct" /> <!--base_link-->
         <remap from="gps/fix" to="pwk7/gps/fix" />
     </node>
 
